@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsMyComponent",
+  "title": "My Component Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Your Component Name",
+      "x-prompt": "what is the component name?"
+    },
+    "type": {
+      "type": "string",
+      "description": "Your Component Type (Atom | Molecules)",
+      "x-prompt": "what is the component type?"
+    }
+  },
+  "required": ["name", "type"]
+}
