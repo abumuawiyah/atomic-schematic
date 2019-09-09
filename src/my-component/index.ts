@@ -9,7 +9,8 @@ import {
   SchematicContext,
   template,
   Tree,
-  url
+  url,
+  chain
 } from "@angular-devkit/schematics";
 import { join, normalize } from "path";
 import { getWorkspace } from "@schematics/angular/utility/config";
@@ -31,28 +32,52 @@ export function myComponent(_options: any): Rule {
   return (tree: Tree, _context: SchematicContext) => {
     setupOptions(tree, _options);
 
-    const movePath = _options.flat
+    const moveComponentPath = _options.flat
       ? normalize(_options.path)
       : normalize(
           _options.path + "/lib/components/" + dasherize(_options.name)
         );
 
-    const templateSource = apply(url("./files/src"), [
+    const templateSource = apply(url("./files/src/component"), [
       template({
         ...strings,
         ..._options
       }),
-      move(movePath),
+      move(moveComponentPath),
       // fix for https://github.com/angular/angular-cli/issues/11337
       forEach((fileEntry: FileEntry) => {
-        console.log("fileEntry", fileEntry);
         if (tree.exists(fileEntry.path)) {
           tree.overwrite(fileEntry.path, fileEntry.content);
         }
         return fileEntry;
       })
     ]);
-    const rule = mergeWith(templateSource, MergeStrategy.Overwrite);
-    return rule(tree, _context);
+
+    const moveStoryPath = _options.flat
+      ? normalize(_options.path)
+      : normalize("src/stories/" + dasherize(_options.name));
+
+    const templateSource2 = apply(url("./files/src/story"), [
+      template({
+        ...strings,
+        ..._options
+      }),
+      move(moveStoryPath),
+      // fix for https://github.com/angular/angular-cli/issues/11337
+      forEach((fileEntry: FileEntry) => {
+        if (tree.exists(fileEntry.path)) {
+          tree.overwrite(fileEntry.path, fileEntry.content);
+        }
+        return fileEntry;
+      })
+    ]);
+
+    // const rule = mergeWith(templateSource, MergeStrategy.Overwrite);
+    // const rule2 = mergeWith(templateSource2, MergeStrategy.Overwrite);
+
+    return chain([
+      mergeWith(templateSource, MergeStrategy.Overwrite),
+      mergeWith(templateSource2, MergeStrategy.Overwrite)
+    ]);
   };
 }

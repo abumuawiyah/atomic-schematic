@@ -12,7 +12,7 @@
     "type": {
       "type": "string",
       "description": "Your Component Type (Atom | Molecules)",
-      "x-prompt": "what is the component type?"
+      "x-prompt": "what is the component type (Atom | Molecules)?"
     }
   },
   "required": ["name", "type"]
