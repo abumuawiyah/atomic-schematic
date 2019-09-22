@@ -5,7 +5,10 @@ import { boolean, select, withKnobs } from "@storybook/addon-knobs";
 import { CommonModule } from "@angular/common";
 import { AtomicComponentModule } from "projects/atomic-component/src/public-api";
 
-storiesOf("Components|Atoms/<%= classify(name) %>", module)
+storiesOf(
+  "Components|<%= classify(componentType) %>/<%= classify(name) %>",
+  module
+)
   .addDecorator(withKnobs)
   .addDecorator(
     moduleMetadata({
@@ -20,10 +23,25 @@ storiesOf("Components|Atoms/<%= classify(name) %>", module)
       template: `
         <ui-theme-provider>
           <ng-template let-palette="palette">
-            <a-<%= name %>>
-                <%= name %>
-            </a-<%= name %>>
-          </ng-template>
+            <% if (componentType === 'Atoms') { %>
+              <a-<%= name %>>
+                <%= name %> works!
+              </a-<%= name %>>
+            <% } %>
+            <% if (componentType === 'Molecules') { %>
+              <m-<%= name %>>
+                <%= name %> works!
+              </m-<%= name %>>
+            <% } %>
+            <% if (componentType === 'Organisms') { %>
+              it works!
+            <% } %>
+            <% if (componentType === 'Util') { %>
+              <ui-<%= name %>>
+                <%= name %> works!
+              </ui-<%= name %>>
+            <% } %>
+          </ng-template> 
         </ui-theme-provider>
       `,
       props: {}

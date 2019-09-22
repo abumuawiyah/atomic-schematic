@@ -1,6 +1,6 @@
 {
   "name": "atomic-schematic",
-  "version": "0.0.3",
+  "version": "0.0.2",
   "description": "A blank schematics",
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -21,6 +21,7 @@
     "typescript": "~3.2.2"
   },
   "devDependencies": {
-    "@schematics/angular": "^7.3.0"
+    "@schematics/angular": "^7.3.0",
+    "schematics-utilities": "^1.1.3"
   }
 }
