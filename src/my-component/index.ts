@@ -22,6 +22,7 @@ import { dasherize } from "@angular-devkit/core/src/utils/strings";
 import {
   addDeclarationToModule,
   addExportToModule
+  // addImportToModule
 } from "@schematics/angular/utility/ast-utils";
 import { InsertChange } from "@schematics/angular/utility/change";
 import {
@@ -58,8 +59,9 @@ function addDeclarationToNgModule(options: any): Rule {
       (options.flat ? "" : strings.dasherize(options.name) + "/") +
       strings.dasherize(options.name) +
       ".component";
-    const relativePath = buildRelativePath(modulePath, componentPath);
+    const relativePath = buildRelativePath(modulePath, componentPath).substr(1);
     const classifiedName = strings.classify(`${options.name}Component`);
+
     const declarationChanges = addDeclarationToModule(
       source,
       modulePath,
@@ -67,43 +69,68 @@ function addDeclarationToNgModule(options: any): Rule {
       relativePath
     );
 
+    // const exportRecorder = host.beginUpdate(modulePath);
+    const exportChanges = addExportToModule(
+      source,
+      modulePath,
+      classifiedName,
+      relativePath
+    );
+
     const declarationRecorder = host.beginUpdate(modulePath);
-    for (const change of declarationChanges) {
+    console.log(...declarationChanges, ...exportChanges);
+    for (const change of [...declarationChanges, ...exportChanges]) {
       if (change instanceof InsertChange) {
         declarationRecorder.insertLeft(change.pos, change.toAdd);
       }
     }
+
+    //  for (const change of [...exportChanges]) {
+    //   if (change instanceof InsertChange) {
+    //     exportRecorder.insertLeft(change.pos, change.toAdd);
+    //   }
+    // }
+
     host.commitUpdate(declarationRecorder);
 
-    if (options.export) {
-      // Need to refresh the AST because we overwrote the file in the host.
-      const text = host.read(modulePath);
-      if (text === null) {
-        throw new SchematicsException(`File ${modulePath} does not exist.`);
-      }
-      const sourceText = text.toString("utf-8");
-      const source = ts.createSourceFile(
-        modulePath,
-        sourceText,
-        ts.ScriptTarget.Latest,
-        true
-      );
+    // if (options.export) {
+    // if (true) {
+    // console.log("here");
+    // Need to refresh the AST because we overwrote the file in the host.
+    // const text = host.read(modulePath);
+    // if (text === null) {
+    //   throw new SchematicsException(`File ${modulePath} does not exist.`);
+    // }
+    // const sourceText = text.toString("utf-8");
+    // const source = ts.createSourceFile(
+    //   modulePath,
+    //   sourceText,
+    //   ts.ScriptTarget.Latest,
+    //   true
+    // );
 
-      const exportRecorder = host.beginUpdate(modulePath);
-      const exportChanges = addExportToModule(
-        source,
-        modulePath,
-        strings.classify(`${options.name}Component`),
-        relativePath
-      );
+    // const exportRecorder = host.beginUpdate(modulePath);
+    // const exportChanges = addExportToModule(
+    //   source,
+    //   modulePath,
+    //   strings.classify(`${options.name}Component`),
+    //   relativePath
+    // );
 
-      for (const change of exportChanges) {
-        if (change instanceof InsertChange) {
-          exportRecorder.insertLeft(change.pos, change.toAdd);
-        }
-      }
-      host.commitUpdate(exportRecorder);
-    }
+    // const exportChanges2 = addImportToModule(
+    //   source,
+    //   modulePath,
+    //   strings.classify(`${options.module}Module`),
+    //   relativePath
+    // );
+
+    // for (const change of [...exportChanges]) {
+    //   if (change instanceof InsertChange) {
+    //     exportRecorder.insertLeft(change.pos, change.toAdd);
+    //   }
+    // }
+    // host.commitUpdate(exportRecorder);
+    // }
 
     return host;
   };
