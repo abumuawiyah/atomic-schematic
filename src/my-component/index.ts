@@ -22,18 +22,9 @@ import { dasherize } from "@angular-devkit/core/src/utils/strings";
 import {
   addDeclarationToModule,
   addExportToModule
-  // addImportToModule
 } from "@schematics/angular/utility/ast-utils";
 import { InsertChange } from "@schematics/angular/utility/change";
-import {
-  buildRelativePath
-  // findModuleFromOptions
-} from "@schematics/angular/utility/find-module";
-// import { parseName } from "@schematics/angular/utility/parse-name";
-// import {
-//   validateHtmlSelector,
-//   validateName
-// } from "@schematics/angular/utility/validation";
+import { buildRelativePath } from "@schematics/angular/utility/find-module";
 
 function addDeclarationToNgModule(options: any): Rule {
   return (host: Tree) => {
@@ -61,77 +52,31 @@ function addDeclarationToNgModule(options: any): Rule {
       ".component";
     const relativePath = buildRelativePath(modulePath, componentPath).substr(1);
     const classifiedName = strings.classify(`${options.name}Component`);
-
     const declarationChanges = addDeclarationToModule(
       source,
       modulePath,
       classifiedName,
       relativePath
     );
-
-    // const exportRecorder = host.beginUpdate(modulePath);
     const exportChanges = addExportToModule(
       source,
       modulePath,
       classifiedName,
       relativePath
     );
-
     const declarationRecorder = host.beginUpdate(modulePath);
-    console.log(...declarationChanges, ...exportChanges);
-    for (const change of [...declarationChanges, ...exportChanges]) {
+
+    /**
+     * both addDeclarationToModule and addExportToModule will add import.
+     * to remove duplicate, i remove the toAdd of exportChanges
+     */
+    for (const change of [...declarationChanges, exportChanges[0]]) {
       if (change instanceof InsertChange) {
         declarationRecorder.insertLeft(change.pos, change.toAdd);
       }
     }
 
-    //  for (const change of [...exportChanges]) {
-    //   if (change instanceof InsertChange) {
-    //     exportRecorder.insertLeft(change.pos, change.toAdd);
-    //   }
-    // }
-
     host.commitUpdate(declarationRecorder);
-
-    // if (options.export) {
-    // if (true) {
-    // console.log("here");
-    // Need to refresh the AST because we overwrote the file in the host.
-    // const text = host.read(modulePath);
-    // if (text === null) {
-    //   throw new SchematicsException(`File ${modulePath} does not exist.`);
-    // }
-    // const sourceText = text.toString("utf-8");
-    // const source = ts.createSourceFile(
-    //   modulePath,
-    //   sourceText,
-    //   ts.ScriptTarget.Latest,
-    //   true
-    // );
-
-    // const exportRecorder = host.beginUpdate(modulePath);
-    // const exportChanges = addExportToModule(
-    //   source,
-    //   modulePath,
-    //   strings.classify(`${options.name}Component`),
-    //   relativePath
-    // );
-
-    // const exportChanges2 = addImportToModule(
-    //   source,
-    //   modulePath,
-    //   strings.classify(`${options.module}Module`),
-    //   relativePath
-    // );
-
-    // for (const change of [...exportChanges]) {
-    //   if (change instanceof InsertChange) {
-    //     exportRecorder.insertLeft(change.pos, change.toAdd);
-    //   }
-    // }
-    // host.commitUpdate(exportRecorder);
-    // }
-
     return host;
   };
 }
@@ -197,17 +142,9 @@ export function myComponent(_options: any): Rule {
       })
     ]);
 
-    // const rule = mergeWith(templateSource, MergeStrategy.Overwrite);
-    // const rule2 = mergeWith(templateSource2, MergeStrategy.Overwrite);
-
     if (_options.componentType === "Organisms") {
       return chain([mergeWith(templateSource2, MergeStrategy.Overwrite)]);
     }
-
-    // return chain([
-    //   mergeWith(templateSource, MergeStrategy.Overwrite),
-    //   mergeWith(templateSource2, MergeStrategy.Overwrite)
-    // ]);
 
     return chain([
       branchAndMerge(
