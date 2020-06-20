@@ -15,35 +15,33 @@ storiesOf(
       imports: [CommonModule, AtomicComponentModule],
       schemas: [],
       declarations: [],
-      entryComponents: []
+      entryComponents: [],
     })
   )
   .add("default", () => {
     return {
       template: `
-        <ui-theme-provider>
-          <ng-template let-palette="palette">
-            <% if (componentType === 'Atoms') { %>
-              <a-<%= name %>>
-                <%= name %> works!
-              </a-<%= name %>>
-            <% } %>
-            <% if (componentType === 'Molecules') { %>
-              <m-<%= name %>>
-                <%= name %> works!
-              </m-<%= name %>>
-            <% } %>
-            <% if (componentType === 'Organisms') { %>
-              it works!
-            <% } %>
-            <% if (componentType === 'Util') { %>
-              <ui-<%= name %>>
-                <%= name %> works!
-              </ui-<%= name %>>
-            <% } %>
-          </ng-template> 
-        </ui-theme-provider>
+        <div>
+          <% if (componentType === 'Atoms') { %>
+            <a-<%= name %>>
+              <%= name %> works!
+            </a-<%= name %>>
+          <% } %>
+          <% if (componentType === 'Molecules') { %>
+            <m-<%= name %>>
+              <%= name %> works!
+            </m-<%= name %>>
+          <% } %>
+          <% if (componentType === 'Organisms') { %>
+            it works!
+          <% } %>
+          <% if (componentType === 'Util') { %>
+            <ui-<%= name %>>
+              <%= name %> works!
+            </ui-<%= name %>>
+          <% } %>
+        </div> 
       `,
-      props: {}
+      props: {},
     };
   });

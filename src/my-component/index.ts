@@ -12,7 +12,7 @@ import {
   url,
   chain,
   SchematicsException,
-  branchAndMerge
+  branchAndMerge,
 } from "@angular-devkit/schematics";
 import * as ts from "typescript";
 import { join, normalize } from "path";
@@ -21,7 +21,7 @@ import { strings } from "@angular-devkit/core";
 import { dasherize } from "@angular-devkit/core/src/utils/strings";
 import {
   addDeclarationToModule,
-  addExportToModule
+  addExportToModule,
 } from "@schematics/angular/utility/ast-utils";
 import { InsertChange } from "@schematics/angular/utility/change";
 import { buildRelativePath } from "@schematics/angular/utility/find-module";
@@ -83,6 +83,8 @@ function addDeclarationToNgModule(options: any): Rule {
 
 export function setupOptions(host: Tree, options: any): Tree {
   const workspace = getWorkspace(host);
+  console.log("workspace.projects", workspace.projects);
+  console.log("options.project", options.project);
 
   if (!options.project) {
     options.project = Object.keys(workspace.projects)[0];
@@ -107,7 +109,7 @@ export function myComponent(_options: any): Rule {
     const templateSource = apply(url("./files/src/component"), [
       template({
         ...strings,
-        ..._options
+        ..._options,
       }),
       move(moveComponentPath),
       // fix for https://github.com/angular/angular-cli/issues/11337
@@ -116,7 +118,7 @@ export function myComponent(_options: any): Rule {
           tree.overwrite(fileEntry.path, fileEntry.content);
         }
         return fileEntry;
-      })
+      }),
     ]);
 
     const moveStoryPath = _options.flat
@@ -130,7 +132,7 @@ export function myComponent(_options: any): Rule {
     const templateSource2 = apply(url("./files/src/story"), [
       template({
         ...strings,
-        ..._options
+        ..._options,
       }),
       move(moveStoryPath),
       // fix for https://github.com/angular/angular-cli/issues/11337
@@ -139,7 +141,7 @@ export function myComponent(_options: any): Rule {
           tree.overwrite(fileEntry.path, fileEntry.content);
         }
         return fileEntry;
-      })
+      }),
     ]);
 
     if (_options.componentType === "Organisms") {
@@ -151,9 +153,9 @@ export function myComponent(_options: any): Rule {
         chain([
           addDeclarationToNgModule(_options),
           mergeWith(templateSource, MergeStrategy.Overwrite),
-          mergeWith(templateSource2, MergeStrategy.Overwrite)
+          mergeWith(templateSource2, MergeStrategy.Overwrite),
         ])
-      )
+      ),
     ])(tree, _context);
   };
 }
